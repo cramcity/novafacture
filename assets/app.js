@@ -24,10 +24,13 @@
     "sn": { labelEn: "Senegal — VAT 18%", label: "Sénégal — TVA 18 %", cur: "XOF", taxes: [["TVA", 18]], ids: ["NINEA", "RCCM"] },
     "cm": { labelEn: "Cameroon — VAT 19.25%", label: "Cameroun — TVA 19,25 %", cur: "XAF", taxes: [["TVA", 19.25]], ids: ["NIU", "RCCM"] },
     "cd": { labelEn: "DR Congo — VAT 16%", label: "RD Congo — TVA 16 %", cur: "CDF", taxes: [["TVA", 16]], ids: ["NIF", "RCCM"] },
+    "uk": { labelEn: "United Kingdom — VAT 20%", label: "Royaume-Uni — TVA (VAT) 20 %", cur: "GBP", taxes: [["TVA", 20]], ids: ["VAT No."] },
+    "au": { labelEn: "Australia — GST 10%", label: "Australie — GST 10 %", cur: "AUD", taxes: [["TPS", 10]], ids: ["ABN"], legal: "Facture fiscale (Tax invoice).", legalEn: "Tax invoice." },
+    "us": { labelEn: "United States — no sales tax", label: "États-Unis — sans taxe de vente", cur: "USD", taxes: [], ids: ["EIN (optional)"] },
     "none": { labelEn: "No tax", label: "Sans taxe", cur: "USD", taxes: [], ids: [] },
     "custom": { labelEn: "Custom (1 tax)", label: "Personnalisé (1 taxe)", cur: "USD", taxes: [["Taxe", 10]], ids: [], custom: true }
   };
-  const CURRENCIES = ["CAD", "EUR", "USD", "CHF", "XOF", "XAF", "CDF", "MAD", "GBP"];
+  const CURRENCIES = ["CAD", "EUR", "USD", "GBP", "AUD", "CHF", "XOF", "XAF", "CDF", "MAD"];
 
   const T = {
     fr: { invoice: "FACTURE", quote: "DEVIS", from: "Émetteur", to: "Facturé à", toQ: "Client", num: "N°", date: "Date", due: "Échéance", valid: "Valable jusqu'au", desc: "Description", qty: "Qté", price: "Prix unitaire", amount: "Montant", sub: "Sous-total", total: "Total", made: "Document créé gratuitement avec NovaFacture" },
