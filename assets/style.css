@@ -71,3 +71,15 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:30px 20px}
   .doc{border:0;box-shadow:none;padding:0;min-height:0}
   @page{margin:16mm}
 }
+
+.doc .paid-stamp{margin-top:14px;display:inline-block;border:3px solid #0fa37f;color:#0fa37f;font-weight:800;padding:6px 14px;border-radius:8px;transform:rotate(-3deg);letter-spacing:.05em}
+.nf-kpis{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 14px}
+.nf-kpi{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:2px;font-size:13px}
+.nf-kpi .late,.nf-st.overdue{color:#b42318;font-weight:700}
+.nf-table{overflow-x:auto}.nf-table table{width:100%;border-collapse:collapse;font-size:14px}
+.nf-table th,.nf-table td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.nf-table .num{text-align:right;white-space:nowrap}.nf-table small{color:var(--muted)}
+.nf-table select{width:auto;padding:2px 4px;font-size:12px;margin-top:4px}
+.nf-act{white-space:nowrap}.nf-act .btn{margin:2px}
+.nf-st{font-size:12px;font-weight:600}.nf-st.paid{color:#0fa37f}
+@media print{#mes-documents,#nf-client-pick,#nf-client-save{display:none!important}}

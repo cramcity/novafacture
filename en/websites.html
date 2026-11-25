@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Small Business Website Design — from US$349 | NOVA Websites</title>
+<meta name="description" content="Professional website for trades, shops and freelancers: one-page site from US$349, 5-page site US$699. Mobile-friendly, ready for Google, no mandatory subscription.">
+<link rel="alternate" hreflang="fr" href="https://cramcity.github.io/novafacture/sites-web.html">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="./">Nova<span>Websites</span></a>
+  <nav><a href="./">NovaFacture</a><a href="#plans">Plans</a><a class="btn small" href="#plans">Order</a></nav>
+</header>
+
+<section class="hero">
+  <h1>A professional website for your business, without spending your evenings on it</h1>
+  <p>Trades, shops, freelancers: we build a clear, fast, mobile-friendly website that's ready for Google. You send your information, we handle the rest.</p>
+  <p><a class="btn green" href="#plans">See plans</a> <a class="btn ghost" href="../demo/renovation/" target="_blank" rel="noopener">See a sample site (French)</a></p>
+</section>
+
+<section class="section">
+  <div class="grid3">
+    <div class="card"><h2>📱 Mobile first</h2><p>Most customers look you up on their phone. Your site looks great on every screen.</p></div>
+    <div class="card"><h2>🔎 Ready for Google</h2><p>Titles, descriptions, speed and structure optimised so people find you when they search for your trade in your city.</p></div>
+    <div class="card"><h2>💸 No forced subscription</h2><p>Free hosting is possible. You only pay for your domain name (about $15–25 a year, in your name).</p></div>
+  </div>
+</section>
+
+<section class="section" id="plans">
+  <h2>Plans</h2>
+  <div class="grid3">
+    <div class="card"><h2>One-page website</h2><div class="price">US$349</div>
+      <ul><li>About, services, reviews, contact</li><li>Call and email buttons</li><li>Mobile and Google ready</li><li>2 rounds of revisions</li><li>Launch included</li></ul>
+      <a class="btn green" data-site-buy="one" href="#plans">Order</a></div>
+    <div class="card"><h2>5-page website</h2><div class="price">US$699</div>
+      <ul><li>Home, services, about, portfolio, contact</li><li>Photo gallery</li><li>Mobile and Google ready (one page per service)</li><li>3 rounds of revisions</li><li>Launch included</li></ul>
+      <a class="btn green" data-site-buy="five" href="#plans">Order</a></div>
+    <div class="card"><h2>Monthly care</h2><div class="price">US$29 / month</div>
+      <ul><li>Text, price and photo updates</li><li>Monthly site check</li><li>Cancel anytime</li></ul>
+      <p style="font-size:13px;color:var(--muted)">Offered once your site is live.</p></div>
+  </div>
+  <p id="site-soon" style="color:var(--warn);font-weight:600" hidden>Online ordering opens very soon. Message us in the meantime.</p>
+</section>
+
+<section class="section">
+  <h2>How it works</h2>
+  <ol>
+    <li><b>Order</b>: secure payment by PayPal or card.</li>
+    <li><b>Questionnaire</b>: you instantly receive a short questionnaire (business, services, photos, contact details). Send it back by replying to the confirmation email.</li>
+    <li><b>Draft</b>: first version online within 5 business days of receiving the completed questionnaire.</li>
+    <li><b>Revisions</b>: you request changes, we apply them.</li>
+    <li><b>Launch</b>: on your domain name, or on a free address if you don't have one yet.</li>
+  </ol>
+  <p style="font-size:13px;color:var(--muted)">Full refund if work has not started. The site and its copy are yours once paid.</p>
+</section>
+
+<section class="section faq">
+  <h2>Questions</h2>
+  <details><summary>Do I need to pay for hosting?</summary><p>Not necessarily: a business website can be hosted for free. Only the domain name (e.g. mybusiness.com) costs money, bought directly from a registrar in your name.</p></details>
+  <details><summary>Can you write the copy?</summary><p>Yes: from your questionnaire we write clear copy in English or French. You approve it before launch.</p></details>
+  <details><summary>How can I contact you before ordering?</summary><p>Message the <a href="https://www.facebook.com/profile.php?id=61596862414883" target="_blank" rel="noopener">Nova Digital Group</a> page on Messenger.</p></details>
+</section>
+
+<footer>NOVA Websites — a NOVA DIGITAL GROUP service · <a href="./">NovaFacture</a> · <a href="kit.html">Freelance Business Kit</a></footer>
+<script src="../assets/config.js"></script>
+<script>
+  (function () {
+    var C = window.NOVA_CONFIG || {}, urls = { one: C.siteOneCheckoutUrl, five: C.siteFiveCheckoutUrl }, missing = false;
+    document.querySelectorAll("[data-site-buy]").forEach(function (a) {
+      var u = urls[a.getAttribute("data-site-buy")];
+      if (u) { a.href = u; a.target = "_blank"; a.rel = "noopener"; } else { missing = true; a.removeAttribute("href"); a.style.opacity = ".5"; a.textContent = "Soon"; }
+    });
+    if (missing) document.getElementById("site-soon").hidden = false;
+  })();
+</script>
+</body>
+</html>

@@ -33,8 +33,8 @@
   const CURRENCIES = ["CAD", "EUR", "USD", "GBP", "AUD", "CHF", "XOF", "XAF", "CDF", "MAD"];
 
   const T = {
-    fr: { invoice: "FACTURE", quote: "DEVIS", from: "Émetteur", to: "Facturé à", toQ: "Client", num: "N°", date: "Date", due: "Échéance", valid: "Valable jusqu'au", desc: "Description", qty: "Qté", price: "Prix unitaire", amount: "Montant", sub: "Sous-total", total: "Total", made: "Document créé gratuitement avec NovaFacture" },
-    en: { invoice: "INVOICE", quote: "QUOTE", from: "From", to: "Bill to", toQ: "Client", num: "No.", date: "Date", due: "Due date", valid: "Valid until", desc: "Description", qty: "Qty", price: "Unit price", amount: "Amount", sub: "Subtotal", total: "Total", made: "Created for free with NovaFacture" }
+    fr: { invoice: "FACTURE", quote: "DEVIS", from: "Émetteur", to: "Facturé à", toQ: "Client", num: "N°", date: "Date", due: "Échéance", valid: "Valable jusqu'au", receipt: "REÇU", paidOn: "Payé le", toR: "Reçu de", paid: "PAYÉ — merci !", desc: "Description", qty: "Qté", price: "Prix unitaire", amount: "Montant", sub: "Sous-total", total: "Total", made: "Document créé gratuitement avec NovaFacture" },
+    en: { invoice: "INVOICE", quote: "QUOTE", from: "From", to: "Bill to", toQ: "Client", num: "No.", date: "Date", due: "Due date", valid: "Valid until", receipt: "RECEIPT", paidOn: "Paid on", toR: "Received from", paid: "PAID — thank you!", desc: "Description", qty: "Qty", price: "Unit price", amount: "Amount", sub: "Subtotal", total: "Total", made: "Created for free with NovaFacture" }
   };
 
   // Noms des taxes sur un document en anglais
@@ -126,7 +126,7 @@
   // ---------- Aperçu ----------
   function render() {
     const t = T[state.lang] || T.fr;
-    const isQ = state.type === "quote";
+    const isQ = state.type === "quote", isR = state.type === "receipt";
     const { sub, tx, total } = compute();
     const rows = state.lines.filter((l) => l.d || Number(l.p)).map((l) => {
       const amt = round2((Number(l.q) || 0) * (Number(l.p) || 0));
@@ -135,16 +135,16 @@
 
     $("#doc").innerHTML = `
       <div class="dhead">
-        <div>${state.logo ? `<img class="dlogo" src="${esc(state.logo)}" alt="Logo">` : ""}<h1>${isQ ? t.quote : t.invoice}</h1></div>
+        <div>${state.logo ? `<img class="dlogo" src="${esc(state.logo)}" alt="Logo">` : ""}<h1>${isR ? t.receipt : isQ ? t.quote : t.invoice}</h1></div>
         <div class="meta">
           <div><b>${t.num}</b> ${esc(state.number)}</div>
           <div><b>${t.date}</b> ${esc(state.date)}</div>
-          ${state.due ? `<div><b>${isQ ? t.valid : t.due}</b> ${esc(state.due)}</div>` : ""}
+          ${state.due ? `<div><b>${isR ? t.paidOn : isQ ? t.valid : t.due}</b> ${esc(state.due)}</div>` : ""}
         </div>
       </div>
       <div class="parties">
         <div><h3>${t.from}</h3><div>${esc(state.seller) || "<span style='color:#aaa'>" + L("Votre nom / entreprise", "Your name / business") + "</span>"}</div><div style="color:#555;margin-top:4px">${esc(state.sellerIds)}</div></div>
-        <div><h3>${isQ ? t.toQ : t.to}</h3><div>${esc(state.client) || "<span style='color:#aaa'>" + L("Nom du client", "Client name") + "</span>"}</div></div>
+        <div><h3>${isR ? t.toR : isQ ? t.toQ : t.to}</h3><div>${esc(state.client) || "<span style='color:#aaa'>" + L("Nom du client", "Client name") + "</span>"}</div></div>
       </div>
       <table><thead><tr><th>${t.desc}</th><th class="num">${t.qty}</th><th class="num">${t.price}</th><th class="num">${t.amount}</th></tr></thead><tbody>${rows}</tbody></table>
       <div class="totals">
@@ -152,6 +152,7 @@
         ${tx.map(([n, r, a]) => `<div><span>${esc(taxName(n))} (${state.lang === "en" ? r + "%" : String(r).replace(".", ",") + " %"})</span><span>${money(a)}</span></div>`).join("")}
         <div class="grand"><span>${t.total}</span><span>${money(total)}</span></div>
       </div>
+      ${isR ? `<div class="paid-stamp">${t.paid}</div>` : ""}
       ${state.notes ? `<div class="notes">${esc(state.notes)}</div>` : ""}
       ${state.legal ? `<div class="legal">${esc(state.legal)}</div>` : ""}
       <div class="foot">${t.made}</div>`;
@@ -200,6 +201,19 @@
     renderLines(); render();
   }
 
-  window.NovaFacture = { compute, PRESETS, get state() { return state; } };
+  const FIELDS = ["type", "lang", "number", "date", "due", "seller", "sellerIds", "client", "notes", "legal", "customName", "customRate", "currency"];
+  // Charge un document complet dans le formulaire (utilisé par « Mes documents »). Le logo actuel est conservé si absent.
+  function applyState(s) {
+    const logo = state.logo;
+    state = Object.assign(defaults(), JSON.parse(JSON.stringify(s)));
+    if (!state.logo) state.logo = logo;
+    if (!Array.isArray(state.lines) || !state.lines.length) state.lines = [{ d: "", q: 1, p: 0 }];
+    FIELDS.forEach((k) => { const el = $("#" + k); if (el) el.value = state[k] ?? ""; });
+    $("#preset").value = state.preset;
+    $("#customBox").hidden = !PRESETS[state.preset]?.custom;
+    renderLines(); render();
+  }
+
+  window.NovaFacture = { compute, PRESETS, applyState, nextNumber, toast, money, get state() { return state; } };
   document.addEventListener("DOMContentLoaded", init);
 })();
