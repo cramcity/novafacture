@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Générateur de facture gratuit — TPS/TVQ, TVA | NovaFacture</title>
+<meta name="description" content="Créez gratuitement une facture ou un devis professionnel en PDF, sans inscription. Taxes calculées automatiquement : Québec (TPS/TVQ), Ontario, France, Belgique, Suisse, Afrique francophone.">
+<meta property="og:title" content="NovaFacture — factures et devis gratuits, sans inscription">
+<meta property="og:description" content="Facture PDF en 2 minutes. TPS/TVQ, TVA, mentions légales incluses. Vos données restent sur votre appareil.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f4cdd'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"NovaFacture","applicationCategory":"BusinessApplication","operatingSystem":"Web","inLanguage":"fr","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"NOVA DIGITAL GROUP"}}
+</script>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="./">Nova<span>Facture</span></a>
+  <nav><a href="#faq">FAQ</a><a href="kit.html">Kit Freelance Pro</a><a class="btn small" href="#outil">Créer une facture</a></nav>
+</header>
+
+<section class="hero">
+  <h1>Générateur de facture et de devis gratuit</h1>
+  <p>Une facture professionnelle en PDF en 2 minutes. Sans inscription, sans filigrane payant. Les taxes et les mentions obligatoires sont calculées pour vous. Vos données ne quittent jamais votre appareil.</p>
+  <div class="badges"><span class="badge">Québec TPS + TVQ</span><span class="badge">France TVA / micro-entrepreneur</span><span class="badge">Belgique · Suisse</span><span class="badge">Afrique francophone</span><span class="badge">Français / English</span></div>
+</section>
+
+<main class="wrap" id="outil">
+  <form class="card form" onsubmit="return false">
+    <h2>1. Document</h2>
+    <div class="row">
+      <div><label for="type">Type</label><select id="type"><option value="invoice">Facture</option><option value="quote">Devis / soumission</option></select></div>
+      <div><label for="lang">Langue du document</label><select id="lang"><option value="fr">Français</option><option value="en">English</option></select></div>
+    </div>
+    <div class="row3">
+      <div><label for="number">Numéro</label><input id="number"></div>
+      <div><label for="date">Date</label><input id="date" type="date"></div>
+      <div><label for="due">Échéance</label><input id="due" type="date"></div>
+    </div>
+
+    <fieldset><legend>2. Pays et taxes</legend>
+      <label for="preset">Régime fiscal</label><select id="preset"></select>
+      <div id="customBox" class="row" hidden>
+        <div><label for="customName">Nom de la taxe</label><input id="customName"></div>
+        <div><label for="customRate">Taux (%)</label><input id="customRate" type="number" step="any"></div>
+      </div>
+      <label for="currency">Devise</label><select id="currency"></select>
+    </fieldset>
+
+    <fieldset><legend>3. Vous</legend>
+      <label for="seller">Nom, entreprise, adresse, courriel</label><textarea id="seller" placeholder="Marie Tremblay&#10;Design graphique&#10;123 rue Principale, Montréal QC&#10;marie@exemple.com"></textarea>
+      <label for="sellerIds">Numéros (TPS, TVQ, SIRET…)</label><textarea id="sellerIds"></textarea>
+      <label for="logo">Logo (facultatif)</label>
+      <div class="row"><input id="logo" type="file" accept="image/*"><button type="button" class="btn ghost small" id="noLogo">Retirer le logo</button></div>
+    </fieldset>
+
+    <fieldset><legend>4. Client</legend>
+      <label for="client">Nom et adresse du client</label><textarea id="client" placeholder="Entreprise ABC inc.&#10;456 boul. Saint-Laurent&#10;Montréal QC"></textarea>
+    </fieldset>
+
+    <fieldset><legend>5. Prestations</legend>
+      <div class="line" style="font-size:11px;color:var(--muted);font-weight:700"><span>Description</span><span>Qté</span><span>Prix</span><span></span></div>
+      <div id="lines"></div>
+      <button type="button" class="btn ghost small" id="addLine">+ Ajouter une ligne</button>
+    </fieldset>
+
+    <label for="notes">Conditions de paiement / notes</label><textarea id="notes"></textarea>
+    <label for="legal">Mentions légales</label><textarea id="legal"></textarea>
+
+    <div class="actions">
+      <button type="button" class="btn green" id="print">Télécharger en PDF</button>
+      <button type="button" class="btn ghost" id="newDoc">Nouveau document</button>
+      <button type="button" class="btn ghost" id="reset">Tout effacer</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted)">« Télécharger en PDF » ouvre l'impression : choisissez « Enregistrer au format PDF ». Vos coordonnées sont mémorisées sur cet appareil seulement.</p>
+  </form>
+
+  <div class="preview-shell"><div class="doc" id="doc" aria-live="polite"></div></div>
+</main>
+
+<div class="upsell">
+  <div class="card">
+    <div><b style="font-size:18px">Vous facturez déjà ? Faites-vous payer plus, et plus vite.</b>
+      <p>Kit Freelance Pro : contrat de services, CGV, calculateur de tarif, suivi des revenus et des impayés, courriels de relance prêts à envoyer.</p></div>
+    <a class="btn" style="background:#fff;color:#1d2b8f" href="kit.html">Découvrir le kit — <span data-kit-price></span></a>
+  </div>
+</div>
+
+<section class="section faq" id="faq">
+  <h2>Questions fréquentes</h2>
+  <details><summary>Est-ce vraiment gratuit ?</summary><p>Oui. Le générateur est gratuit, sans inscription et sans limite. Il est financé par la vente du Kit Freelance Pro, facultatif.</p></details>
+  <details><summary>Où sont stockées mes données ?</summary><p>Uniquement dans votre navigateur (stockage local). Rien n'est envoyé à un serveur. Si vous videz les données du navigateur, elles sont effacées.</p></details>
+  <details><summary>Quelles mentions doivent figurer sur une facture au Québec ?</summary><p>Notamment : nom du fournisseur, date, montant total, numéros d'inscription TPS et TVQ si vous êtes inscrit, montant de chaque taxe, nom de l'acheteur pour les ventes de 150 $ ou plus, et la description des biens ou services. Référez-vous à Revenu Québec pour votre situation.</p></details>
+  <details><summary>Dois-je facturer la TPS et la TVQ ?</summary><p>Au Canada, l'inscription n'est généralement obligatoire qu'au-delà de 30 000 $ de ventes taxables sur quatre trimestres (statut de petit fournisseur). Choisissez « petit fournisseur (sans taxes) » si vous n'êtes pas inscrit. En cas de doute, consultez un comptable.</p></details>
+  <details><summary>Je suis micro-entrepreneur en France : que mettre ?</summary><p>Choisissez « France — micro-entrepreneur ». La mention « TVA non applicable, art. 293 B du CGI » et les pénalités de retard sont ajoutées automatiquement. Indiquez votre SIRET.</p></details>
+  <details><summary>Puis-je faire un devis ?</summary><p>Oui : choisissez « Devis / soumission ». La date d'échéance devient la date de validité de l'offre.</p></details>
+  <p style="font-size:12px;color:var(--muted)">Les taux de taxes sont fournis à titre indicatif (novembre 2026). Vérifiez-les auprès de votre administration fiscale. NovaFacture ne fournit pas de conseil fiscal ou juridique.</p>
+</section>
+
+<footer>NovaFacture est un service de NOVA DIGITAL GROUP · <a href="kit.html">Kit Freelance Pro</a> · <a href="confidentialite.html">Confidentialité</a></footer>
+<div class="toast" id="toast" role="status"></div>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
