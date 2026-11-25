@@ -4,26 +4,28 @@
   const C = window.NOVA_CONFIG || {};
   const $ = (s) => document.querySelector(s);
   const STORE = "novafacture.v1";
+  const UI_EN = document.documentElement.lang === "en";
+  const L = (fr, en) => (UI_EN ? en : fr);
 
   // Préréglages fiscaux. Taux vérifiés nov. 2026 — l'utilisateur peut toujours choisir "Personnalisé".
   const PRESETS = {
-    "qc": { label: "Canada — Québec (TPS 5 % + TVQ 9,975 %)", cur: "CAD", taxes: [["TPS", 5], ["TVQ", 9.975]], ids: ["N° TPS", "N° TVQ"] },
-    "on": { label: "Canada — Ontario (TVH 13 %)", cur: "CAD", taxes: [["TVH", 13]], ids: ["N° TPS/TVH"] },
-    "atl15": { label: "Canada — N.-B., T.-N.-L., Î.-P.-É. (TVH 15 %)", cur: "CAD", taxes: [["TVH", 15]], ids: ["N° TPS/TVH"] },
-    "ns": { label: "Canada — Nouvelle-Écosse (TVH 14 %)", cur: "CAD", taxes: [["TVH", 14]], ids: ["N° TPS/TVH"] },
-    "ca5": { label: "Canada — autres provinces (TPS 5 %)", cur: "CAD", taxes: [["TPS", 5]], ids: ["N° TPS"] },
-    "ca0": { label: "Canada — petit fournisseur (sans taxes)", cur: "CAD", taxes: [], ids: [], legal: "Petit fournisseur non inscrit aux fichiers de la TPS et de la TVQ." },
-    "fr20": { label: "France — TVA 20 %", cur: "EUR", taxes: [["TVA", 20]], ids: ["SIRET", "N° TVA intracom."], legal: "Pénalités de retard : 3 fois le taux d'intérêt légal. Indemnité forfaitaire pour frais de recouvrement : 40 €. Pas d'escompte pour paiement anticipé." },
-    "frae": { label: "France — micro-entrepreneur (franchise de TVA)", cur: "EUR", taxes: [], ids: ["SIRET"], legal: "TVA non applicable, art. 293 B du CGI.\nPénalités de retard : 3 fois le taux d'intérêt légal. Indemnité forfaitaire pour frais de recouvrement : 40 €." },
-    "be21": { label: "Belgique — TVA 21 %", cur: "EUR", taxes: [["TVA", 21]], ids: ["N° d'entreprise / TVA"] },
-    "befr": { label: "Belgique — franchise des petites entreprises", cur: "EUR", taxes: [], ids: ["N° d'entreprise"], legal: "Régime particulier de franchise des petites entreprises — TVA non applicable." },
-    "ch": { label: "Suisse — TVA 8,1 %", cur: "CHF", taxes: [["TVA", 8.1]], ids: ["IDE / N° TVA"] },
-    "ci": { label: "Côte d'Ivoire — TVA 18 %", cur: "XOF", taxes: [["TVA", 18]], ids: ["NCC", "RCCM"] },
-    "sn": { label: "Sénégal — TVA 18 %", cur: "XOF", taxes: [["TVA", 18]], ids: ["NINEA", "RCCM"] },
-    "cm": { label: "Cameroun — TVA 19,25 %", cur: "XAF", taxes: [["TVA", 19.25]], ids: ["NIU", "RCCM"] },
-    "cd": { label: "RD Congo — TVA 16 %", cur: "CDF", taxes: [["TVA", 16]], ids: ["NIF", "RCCM"] },
-    "none": { label: "Sans taxe", cur: "USD", taxes: [], ids: [] },
-    "custom": { label: "Personnalisé (1 taxe)", cur: "USD", taxes: [["Taxe", 10]], ids: [], custom: true }
+    "qc": { labelEn: "Canada — Quebec (GST 5% + QST 9.975%)", label: "Canada — Québec (TPS 5 % + TVQ 9,975 %)", cur: "CAD", taxes: [["TPS", 5], ["TVQ", 9.975]], ids: ["N° TPS", "N° TVQ"] },
+    "on": { labelEn: "Canada — Ontario (HST 13%)", label: "Canada — Ontario (TVH 13 %)", cur: "CAD", taxes: [["TVH", 13]], ids: ["N° TPS/TVH"] },
+    "atl15": { labelEn: "Canada — NB, NL, PEI (HST 15%)", label: "Canada — N.-B., T.-N.-L., Î.-P.-É. (TVH 15 %)", cur: "CAD", taxes: [["TVH", 15]], ids: ["N° TPS/TVH"] },
+    "ns": { labelEn: "Canada — Nova Scotia (HST 14%)", label: "Canada — Nouvelle-Écosse (TVH 14 %)", cur: "CAD", taxes: [["TVH", 14]], ids: ["N° TPS/TVH"] },
+    "ca5": { labelEn: "Canada — other provinces (GST 5%)", label: "Canada — autres provinces (TPS 5 %)", cur: "CAD", taxes: [["TPS", 5]], ids: ["N° TPS"] },
+    "ca0": { labelEn: "Canada — small supplier (no tax)", legalEn: "Small supplier, not registered for GST/HST.", label: "Canada — petit fournisseur (sans taxes)", cur: "CAD", taxes: [], ids: [], legal: "Petit fournisseur non inscrit aux fichiers de la TPS et de la TVQ." },
+    "fr20": { labelEn: "France — VAT 20%", label: "France — TVA 20 %", cur: "EUR", taxes: [["TVA", 20]], ids: ["SIRET", "N° TVA intracom."], legal: "Pénalités de retard : 3 fois le taux d'intérêt légal. Indemnité forfaitaire pour frais de recouvrement : 40 €. Pas d'escompte pour paiement anticipé." },
+    "frae": { labelEn: "France — micro-entrepreneur (VAT exempt)", label: "France — micro-entrepreneur (franchise de TVA)", cur: "EUR", taxes: [], ids: ["SIRET"], legal: "TVA non applicable, art. 293 B du CGI.\nPénalités de retard : 3 fois le taux d'intérêt légal. Indemnité forfaitaire pour frais de recouvrement : 40 €." },
+    "be21": { labelEn: "Belgium — VAT 21%", label: "Belgique — TVA 21 %", cur: "EUR", taxes: [["TVA", 21]], ids: ["N° d'entreprise / TVA"] },
+    "befr": { labelEn: "Belgium — small business exemption", label: "Belgique — franchise des petites entreprises", cur: "EUR", taxes: [], ids: ["N° d'entreprise"], legal: "Régime particulier de franchise des petites entreprises — TVA non applicable." },
+    "ch": { labelEn: "Switzerland — VAT 8.1%", label: "Suisse — TVA 8,1 %", cur: "CHF", taxes: [["TVA", 8.1]], ids: ["IDE / N° TVA"] },
+    "ci": { labelEn: "Côte d'Ivoire — VAT 18%", label: "Côte d'Ivoire — TVA 18 %", cur: "XOF", taxes: [["TVA", 18]], ids: ["NCC", "RCCM"] },
+    "sn": { labelEn: "Senegal — VAT 18%", label: "Sénégal — TVA 18 %", cur: "XOF", taxes: [["TVA", 18]], ids: ["NINEA", "RCCM"] },
+    "cm": { labelEn: "Cameroon — VAT 19.25%", label: "Cameroun — TVA 19,25 %", cur: "XAF", taxes: [["TVA", 19.25]], ids: ["NIU", "RCCM"] },
+    "cd": { labelEn: "DR Congo — VAT 16%", label: "RD Congo — TVA 16 %", cur: "CDF", taxes: [["TVA", 16]], ids: ["NIF", "RCCM"] },
+    "none": { labelEn: "No tax", label: "Sans taxe", cur: "USD", taxes: [], ids: [] },
+    "custom": { labelEn: "Custom (1 tax)", label: "Personnalisé (1 taxe)", cur: "USD", taxes: [["Taxe", 10]], ids: [], custom: true }
   };
   const CURRENCIES = ["CAD", "EUR", "USD", "CHF", "XOF", "XAF", "CDF", "MAD", "GBP"];
 
@@ -32,15 +34,19 @@
     en: { invoice: "INVOICE", quote: "QUOTE", from: "From", to: "Bill to", toQ: "Client", num: "No.", date: "Date", due: "Due date", valid: "Valid until", desc: "Description", qty: "Qty", price: "Unit price", amount: "Amount", sub: "Subtotal", total: "Total", made: "Created for free with NovaFacture" }
   };
 
+  // Noms des taxes sur un document en anglais
+  const TAX_EN = { TPS: "GST", TVQ: "QST", TVH: "HST", TVA: "VAT", Taxe: "Tax" };
+  const taxName = (n) => (state.lang === "en" && TAX_EN[n]) || n;
+
   const today = () => new Date().toISOString().slice(0, 10);
   const addDays = (d, n) => { const x = new Date(d + "T12:00:00"); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 
   const defaults = () => ({
-    type: "invoice", lang: "fr", preset: "qc", currency: "CAD", customName: "Taxe", customRate: 10,
+    type: "invoice", lang: UI_EN ? "en" : "fr", preset: UI_EN ? "on" : "qc", currency: "CAD", customName: L("Taxe", "Tax"), customRate: 10,
     number: "2026-001", date: today(), due: addDays(today(), 30),
     seller: "", sellerIds: "", client: "", logo: "",
     lines: [{ d: "", q: 1, p: 0 }],
-    notes: "Paiement sous 30 jours par virement ou PayPal. Merci de votre confiance !",
+    notes: L("Paiement sous 30 jours par virement ou PayPal. Merci de votre confiance !", "Payment due within 30 days by bank transfer or PayPal. Thank you for your business!"),
     legal: ""
   });
 
@@ -75,7 +81,7 @@
 
   // ---------- Formulaire ----------
   function fillSelects() {
-    $("#preset").innerHTML = Object.entries(PRESETS).map(([k, v]) => `<option value="${k}">${esc(v.label)}</option>`).join("");
+    $("#preset").innerHTML = Object.entries(PRESETS).map(([k, v]) => `<option value="${k}">${esc(UI_EN ? v.labelEn : v.label)}</option>`).join("");
     $("#currency").innerHTML = CURRENCIES.map((c) => `<option>${c}</option>`).join("");
   }
 
@@ -91,10 +97,10 @@
     state.lines.forEach((l, i) => {
       const row = document.createElement("div");
       row.className = "line";
-      row.innerHTML = `<input aria-label="Description" placeholder="Description du service" value="${esc(l.d)}">
-        <input aria-label="Quantité" type="number" step="any" min="0" value="${esc(l.q)}">
-        <input aria-label="Prix unitaire" type="number" step="any" min="0" value="${esc(l.p)}">
-        <button type="button" title="Supprimer la ligne" aria-label="Supprimer la ligne">×</button>`;
+      row.innerHTML = `<input aria-label="Description" placeholder="${L("Description du service", "Service description")}" value="${esc(l.d)}">
+        <input aria-label="${L("Quantité", "Quantity")}" type="number" step="any" min="0" value="${esc(l.q)}">
+        <input aria-label="${L("Prix unitaire", "Unit price")}" type="number" step="any" min="0" value="${esc(l.p)}">
+        <button type="button" title="${L("Supprimer la ligne", "Remove line")}" aria-label="${L("Supprimer la ligne", "Remove line")}">×</button>`;
       const [d, q, p, del] = row.children;
       d.addEventListener("input", () => { l.d = d.value; render(); });
       q.addEventListener("input", () => { l.q = q.value; render(); });
@@ -108,9 +114,9 @@
     const p = PRESETS[state.preset];
     state.currency = p.cur;
     $("#currency").value = state.currency;
-    state.legal = p.legal || "";
+    state.legal = (UI_EN && p.legalEn) || p.legal || "";
     $("#legal").value = state.legal;
-    $("#sellerIds").placeholder = p.ids.length ? p.ids.join(" : …\n") + " : …" : "Numéros d'entreprise (facultatif)";
+    $("#sellerIds").placeholder = p.ids.length ? p.ids.join(" : …\n") + " : …" : L("Numéros d'entreprise (facultatif)", "Business numbers (optional)");
     $("#customBox").hidden = !p.custom;
   }
 
@@ -134,13 +140,13 @@
         </div>
       </div>
       <div class="parties">
-        <div><h3>${t.from}</h3><div>${esc(state.seller) || "<span style='color:#aaa'>Votre nom / entreprise</span>"}</div><div style="color:#555;margin-top:4px">${esc(state.sellerIds)}</div></div>
-        <div><h3>${isQ ? t.toQ : t.to}</h3><div>${esc(state.client) || "<span style='color:#aaa'>Nom du client</span>"}</div></div>
+        <div><h3>${t.from}</h3><div>${esc(state.seller) || "<span style='color:#aaa'>" + L("Votre nom / entreprise", "Your name / business") + "</span>"}</div><div style="color:#555;margin-top:4px">${esc(state.sellerIds)}</div></div>
+        <div><h3>${isQ ? t.toQ : t.to}</h3><div>${esc(state.client) || "<span style='color:#aaa'>" + L("Nom du client", "Client name") + "</span>"}</div></div>
       </div>
       <table><thead><tr><th>${t.desc}</th><th class="num">${t.qty}</th><th class="num">${t.price}</th><th class="num">${t.amount}</th></tr></thead><tbody>${rows}</tbody></table>
       <div class="totals">
         <div><span>${t.sub}</span><span>${money(sub)}</span></div>
-        ${tx.map(([n, r, a]) => `<div><span>${esc(n)} (${String(r).replace(".", state.lang === "en" ? "." : ",")} %)</span><span>${money(a)}</span></div>`).join("")}
+        ${tx.map(([n, r, a]) => `<div><span>${esc(taxName(n))} (${state.lang === "en" ? r + "%" : String(r).replace(".", ",") + " %"})</span><span>${money(a)}</span></div>`).join("")}
         <div class="grand"><span>${t.total}</span><span>${money(total)}</span></div>
       </div>
       ${state.notes ? `<div class="notes">${esc(state.notes)}</div>` : ""}
@@ -172,12 +178,12 @@
       state.number = nextNumber(state.number); state.date = today(); state.due = addDays(today(), 30);
       state.client = ""; state.lines = [{ d: "", q: 1, p: 0 }];
       ["number", "date", "due", "client"].forEach((k) => ($("#" + k).value = state[k]));
-      renderLines(); render(); toast("Nouveau document — vos coordonnées sont conservées");
+      renderLines(); render(); toast(L("Nouveau document — vos coordonnées sont conservées", "New document — your details are kept"));
     });
-    $("#reset").addEventListener("click", () => { if (confirm("Effacer toutes les données saisies sur cet appareil ?")) { state = defaults(); save(); location.reload(); } });
+    $("#reset").addEventListener("click", () => { if (confirm(L("Effacer toutes les données saisies sur cet appareil ?", "Erase all data entered on this device?"))) { state = defaults(); save(); location.reload(); } });
     $("#logo").addEventListener("change", (e) => {
       const f = e.target.files[0]; if (!f) return;
-      if (f.size > 400000) { toast("Logo trop lourd (max 400 Ko)"); return; }
+      if (f.size > 400000) { toast(L("Logo trop lourd (max 400 Ko)", "Logo too large (max 400 KB)")); return; }
       const r = new FileReader(); r.onload = () => { state.logo = r.result; render(); }; r.readAsDataURL(f);
     });
     $("#noLogo").addEventListener("click", () => { state.logo = ""; $("#logo").value = ""; render(); });
@@ -186,7 +192,7 @@
     document.querySelectorAll("[data-kit-buy]").forEach((a) => {
       if (C.kitCheckoutUrl) { a.href = C.kitCheckoutUrl; a.target = "_blank"; a.rel = "noopener"; }
     });
-    document.querySelectorAll("[data-kit-price]").forEach((el) => (el.textContent = C.kitPrice || ""));
+    document.querySelectorAll("[data-kit-price]").forEach((el) => (el.textContent = (UI_EN ? C.kitPriceEn : C.kitPrice) || ""));
 
     renderLines(); render();
   }

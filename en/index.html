@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Invoice Generator — GST/HST, QST, VAT | NovaFacture</title>
+<meta name="description" content="Create a professional invoice or quote as a PDF for free, no sign-up. Taxes calculated automatically: Canada (GST/HST, Quebec QST), France, Belgium, Switzerland, West and Central Africa.">
+<meta property="og:title" content="NovaFacture — free invoices and quotes, no sign-up">
+<meta property="og:description" content="Invoice PDF in 2 minutes. GST/HST, QST and VAT calculated. Your data stays on your device.">
+<meta property="og:type" content="website">
+<link rel="alternate" hreflang="fr" href="https://cramcity.github.io/novafacture/">
+<link rel="alternate" hreflang="en" href="https://cramcity.github.io/novafacture/en/">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"NovaFacture","applicationCategory":"BusinessApplication","operatingSystem":"Web","inLanguage":"en","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"NOVA DIGITAL GROUP"}}
+</script>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="./">Nova<span>Facture</span></a>
+  <nav><a href="#faq">FAQ</a><a href="../" lang="fr">Français</a><a class="btn small" href="#outil">Create an invoice</a></nav>
+</header>
+
+<section class="hero">
+  <h1>Free invoice and quote generator</h1>
+  <p>A professional PDF invoice in 2 minutes. No sign-up, no paid watermark. Taxes and required mentions are calculated for you. Your data never leaves your device.</p>
+  <div class="badges"><span class="badge">Canada GST/HST</span><span class="badge">Quebec QST</span><span class="badge">France · Belgium · Switzerland VAT</span><span class="badge">West &amp; Central Africa</span><span class="badge">English / <a href="../" lang="fr">Français</a></span></div>
+</section>
+
+<main class="wrap" id="outil">
+  <form class="card form" onsubmit="return false">
+    <h2>1. Document</h2>
+    <div class="row">
+      <div><label for="type">Type</label><select id="type"><option value="invoice">Invoice</option><option value="quote">Quote / estimate</option></select></div>
+      <div><label for="lang">Document language</label><select id="lang"><option value="en">English</option><option value="fr">Français</option></select></div>
+    </div>
+    <div class="row3">
+      <div><label for="number">Number</label><input id="number"></div>
+      <div><label for="date">Date</label><input id="date" type="date"></div>
+      <div><label for="due">Due date</label><input id="due" type="date"></div>
+    </div>
+
+    <fieldset><legend>2. Country and taxes</legend>
+      <label for="preset">Tax regime</label><select id="preset"></select>
+      <div id="customBox" class="row" hidden>
+        <div><label for="customName">Tax name</label><input id="customName"></div>
+        <div><label for="customRate">Rate (%)</label><input id="customRate" type="number" step="any"></div>
+      </div>
+      <label for="currency">Currency</label><select id="currency"></select>
+    </fieldset>
+
+    <fieldset><legend>3. You</legend>
+      <label for="seller">Name, business, address, email</label><textarea id="seller" placeholder="Jane Smith&#10;Graphic Design&#10;123 Main Street, Toronto ON&#10;jane@example.com"></textarea>
+      <label for="sellerIds">Numbers (GST/HST, business number…)</label><textarea id="sellerIds"></textarea>
+      <label for="logo">Logo (optional)</label>
+      <div class="row"><input id="logo" type="file" accept="image/*"><button type="button" class="btn ghost small" id="noLogo">Remove logo</button></div>
+    </fieldset>
+
+    <fieldset><legend>4. Client</legend>
+      <label for="client">Client name and address</label><textarea id="client" placeholder="ABC Company Inc.&#10;456 King Street West&#10;Toronto ON"></textarea>
+    </fieldset>
+
+    <fieldset><legend>5. Services</legend>
+      <div class="line" style="font-size:11px;color:var(--muted);font-weight:700"><span>Description</span><span>Qty</span><span>Price</span><span></span></div>
+      <div id="lines"></div>
+      <button type="button" class="btn ghost small" id="addLine">+ Add a line</button>
+    </fieldset>
+
+    <label for="notes">Payment terms / notes</label><textarea id="notes"></textarea>
+    <label for="legal">Legal mentions</label><textarea id="legal"></textarea>
+
+    <div class="actions">
+      <button type="button" class="btn green" id="print">Download PDF</button>
+      <button type="button" class="btn ghost" id="newDoc">New document</button>
+      <button type="button" class="btn ghost" id="reset">Clear everything</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted)">"Download PDF" opens the print dialog: choose "Save as PDF". Your details are remembered on this device only.</p>
+  </form>
+
+  <div class="preview-shell"><div class="doc" id="doc" aria-live="polite"></div></div>
+</main>
+
+<div class="upsell">
+  <div class="card">
+    <div><b style="font-size:18px">Do you work in French? Get paid more, and faster.</b>
+      <p>Kit Freelance Pro (French-language templates): service contract, terms of sale, rate calculator, income and unpaid-invoice tracker, ready-to-send payment reminders.</p></div>
+    <a class="btn" style="background:#fff;color:#1d2b8f" href="../kit.html" lang="fr">See the kit — <span data-kit-price></span></a>
+  </div>
+</div>
+
+<section class="section faq" id="faq">
+  <h2>Frequently asked questions</h2>
+  <details><summary>Is it really free?</summary><p>Yes. The generator is free, with no sign-up and no limits. It is funded by sales of the optional Kit Freelance Pro.</p></details>
+  <details><summary>Where is my data stored?</summary><p>Only in your browser (local storage). Nothing is sent to a server. If you clear your browser data, it is erased.</p></details>
+  <details><summary>What must a Canadian invoice show?</summary><p>Among other things: your business name, the date, the total, your GST/HST registration number if registered, the tax charged, a description of the goods or services, and the buyer's name for sales of $500 or more. Check with the Canada Revenue Agency for your situation.</p></details>
+  <details><summary>Do I have to charge GST/HST?</summary><p>In Canada, registration is generally required only once your taxable sales exceed $30,000 over four consecutive calendar quarters (small supplier). Choose "small supplier (no tax)" if you are not registered. When in doubt, ask an accountant.</p></details>
+  <details><summary>Can I make a quote?</summary><p>Yes: choose "Quote / estimate". The due date becomes the date the offer is valid until.</p></details>
+  <p style="font-size:12px;color:var(--muted)">Tax rates are provided for information only (November 2026). Check them with your tax authority. NovaFacture does not provide tax or legal advice.</p>
+</section>
+
+<footer>NovaFacture is a service of NOVA DIGITAL GROUP · <a href="../confidentialite.html" lang="fr">Privacy (French)</a></footer>
+<div class="toast" id="toast" role="status"></div>
+<script src="../assets/config.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
