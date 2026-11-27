@@ -83,3 +83,4 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:30px 20px}
 .nf-act{white-space:nowrap}.nf-act .btn{margin:2px}
 .nf-st{font-size:12px;font-weight:600}.nf-st.paid{color:#0fa37f}
 @media print{#mes-documents,#nf-client-pick,#nf-client-save{display:none!important}}
+.doc .paylink{margin-top:12px;padding:8px 10px;background:#f3f6ff;border-radius:8px;font-size:13px;word-break:break-all}.doc .paylink a{color:#2f4cdd}
