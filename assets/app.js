@@ -35,8 +35,8 @@
   const CURRENCIES = ["CAD", "EUR", "USD", "GBP", "AUD", "CHF", "XOF", "XAF", "CDF", "MAD"];
 
   const T = {
-    fr: { invoice: "FACTURE", quote: "DEVIS", from: "Émetteur", to: "Facturé à", toQ: "Client", num: "N°", date: "Date", due: "Échéance", valid: "Valable jusqu'au", receipt: "REÇU", paidOn: "Payé le", toR: "Reçu de", paid: "PAYÉ — merci !", discount: "Remise", net: "Total HT après remise", deposit: "Acompte reçu", balance: "Reste à payer", payOnline: "Payer en ligne", desc: "Description", qty: "Qté", price: "Prix unitaire", amount: "Montant", sub: "Sous-total", total: "Total", made: "Document créé gratuitement avec NovaFacture" },
-    en: { invoice: "INVOICE", quote: "QUOTE", from: "From", to: "Bill to", toQ: "Client", num: "No.", date: "Date", due: "Due date", valid: "Valid until", receipt: "RECEIPT", paidOn: "Paid on", toR: "Received from", paid: "PAID — thank you!", discount: "Discount", net: "Subtotal after discount", deposit: "Deposit received", balance: "Balance due", payOnline: "Pay online", desc: "Description", qty: "Qty", price: "Unit price", amount: "Amount", sub: "Subtotal", total: "Total", made: "Created for free with NovaFacture" }
+    fr: { invoice: "FACTURE", quote: "DEVIS", from: "Émetteur", to: "Facturé à", toQ: "Client", num: "N°", date: "Date", due: "Échéance", valid: "Valable jusqu'au", receipt: "REÇU", paidOn: "Payé le", toR: "Reçu de", paid: "PAYÉ — merci !", discount: "Remise", net: "Total HT après remise", deposit: "Acompte reçu", balance: "Reste à payer", payOnline: "Payer en ligne", scan: "Scannez le code QR avec votre téléphone pour payer", desc: "Description", qty: "Qté", price: "Prix unitaire", amount: "Montant", sub: "Sous-total", total: "Total", made: "Document créé gratuitement avec NovaFacture" },
+    en: { invoice: "INVOICE", quote: "QUOTE", from: "From", to: "Bill to", toQ: "Client", num: "No.", date: "Date", due: "Due date", valid: "Valid until", receipt: "RECEIPT", paidOn: "Paid on", toR: "Received from", paid: "PAID — thank you!", discount: "Discount", net: "Subtotal after discount", deposit: "Deposit received", balance: "Balance due", payOnline: "Pay online", scan: "Scan the QR code with your phone to pay", desc: "Description", qty: "Qty", price: "Unit price", amount: "Amount", sub: "Subtotal", total: "Total", made: "Created for free with NovaFacture" }
   };
 
   // Noms des taxes sur un document en anglais
@@ -161,12 +161,19 @@
         <div class="grand"><span>${t.total}</span><span>${money(total)}</span></div>
         ${dep > 0 && !isR && !isQ ? `<div><span>${t.deposit}</span><span>− ${money(dep)}</span></div><div class="grand"><span>${t.balance}</span><span>${money(round2(total - dep))}</span></div>` : ""}
       </div>
-      ${link && !isR && !isQ ? `<div class="paylink"><b>${t.payOnline} :</b> <a href="${esc(link)}">${esc(link)}</a></div>` : ""}
+      ${link && !isR && !isQ ? `<div class="paylink">${qrSvg(link)}<div><b>${t.payOnline} :</b> <a href="${esc(link)}">${esc(link)}</a>${typeof qrcode === "function" ? `<div class="scan">${t.scan}</div>` : ""}</div></div>` : ""}
       ${isR ? `<div class="paid-stamp">${t.paid}</div>` : ""}
       ${state.notes ? `<div class="notes">${esc(state.notes)}</div>` : ""}
       ${state.legal ? `<div class="legal">${esc(state.legal)}</div>` : ""}
       <div class="foot">${t.made}</div>`;
     save();
+  }
+
+  // QR code du lien de paiement, généré localement (aucune donnée envoyée). Absent si la bibliothèque n'est pas chargée.
+  function qrSvg(link) {
+    if (typeof qrcode !== "function") return "";
+    try { const q = qrcode(0, "M"); q.addData(link); q.make(); return `<div class="qr" aria-hidden="true">${q.createSvgTag({ cellSize: 3, margin: 0, scalable: true })}</div>`; }
+    catch (e) { return ""; }
   }
 
   function toast(msg) { const el = $("#toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2200); }
