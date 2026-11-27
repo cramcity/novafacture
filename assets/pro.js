@@ -147,7 +147,9 @@
       : ["Type", "Numéro", "Date", "Échéance", "Client", "Statut", "Sous-total", "Taxes", "Total", "Acompte reçu", "Reste à payer", "Devise"];
     const rows = docs.slice().sort((a, b) => String(a.state.date || "").localeCompare(String(b.state.date || ""))).map((d) => {
       const s = d.state;
-      const sub = Math.round((s.lines || []).reduce((t, l) => t + (Number(l.q) || 0) * (Number(l.p) || 0), 0) * 100) / 100;
+      const gross = Math.round((s.lines || []).reduce((t, l) => t + (Number(l.q) || 0) * (Number(l.p) || 0), 0) * 100) / 100;
+      const pct = Math.min(100, Math.max(0, Number(String(s.discount || "").replace(",", ".")) || 0));
+      const sub = Math.round((gross - Math.round(gross * pct) / 100) * 100) / 100; // sous-total après remise (base taxable)
       const dep = s.type === "invoice" ? Math.max(0, Number(String(s.deposit || "").replace(",", ".")) || 0) : 0;
       return [TYPE[s.type] || s.type, s.number, s.date, s.type === "receipt" ? "" : s.due, (s.client || "").split("\n")[0], statusLabel(statusOf(d)),
         num(sub), num(d.total - sub), num(d.total), dep ? num(dep) : "", s.type === "invoice" ? num(d.status === "paid" ? 0 : d.total - dep) : "", d.currency].map(cell).join(SEP);

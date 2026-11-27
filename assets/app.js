@@ -33,8 +33,8 @@
   const CURRENCIES = ["CAD", "EUR", "USD", "GBP", "AUD", "CHF", "XOF", "XAF", "CDF", "MAD"];
 
   const T = {
-    fr: { invoice: "FACTURE", quote: "DEVIS", from: "Émetteur", to: "Facturé à", toQ: "Client", num: "N°", date: "Date", due: "Échéance", valid: "Valable jusqu'au", receipt: "REÇU", paidOn: "Payé le", toR: "Reçu de", paid: "PAYÉ — merci !", deposit: "Acompte reçu", balance: "Reste à payer", payOnline: "Payer en ligne", desc: "Description", qty: "Qté", price: "Prix unitaire", amount: "Montant", sub: "Sous-total", total: "Total", made: "Document créé gratuitement avec NovaFacture" },
-    en: { invoice: "INVOICE", quote: "QUOTE", from: "From", to: "Bill to", toQ: "Client", num: "No.", date: "Date", due: "Due date", valid: "Valid until", receipt: "RECEIPT", paidOn: "Paid on", toR: "Received from", paid: "PAID — thank you!", deposit: "Deposit received", balance: "Balance due", payOnline: "Pay online", desc: "Description", qty: "Qty", price: "Unit price", amount: "Amount", sub: "Subtotal", total: "Total", made: "Created for free with NovaFacture" }
+    fr: { invoice: "FACTURE", quote: "DEVIS", from: "Émetteur", to: "Facturé à", toQ: "Client", num: "N°", date: "Date", due: "Échéance", valid: "Valable jusqu'au", receipt: "REÇU", paidOn: "Payé le", toR: "Reçu de", paid: "PAYÉ — merci !", discount: "Remise", net: "Total HT après remise", deposit: "Acompte reçu", balance: "Reste à payer", payOnline: "Payer en ligne", desc: "Description", qty: "Qté", price: "Prix unitaire", amount: "Montant", sub: "Sous-total", total: "Total", made: "Document créé gratuitement avec NovaFacture" },
+    en: { invoice: "INVOICE", quote: "QUOTE", from: "From", to: "Bill to", toQ: "Client", num: "No.", date: "Date", due: "Due date", valid: "Valid until", receipt: "RECEIPT", paidOn: "Paid on", toR: "Received from", paid: "PAID — thank you!", discount: "Discount", net: "Subtotal after discount", deposit: "Deposit received", balance: "Balance due", payOnline: "Pay online", desc: "Description", qty: "Qty", price: "Unit price", amount: "Amount", sub: "Subtotal", total: "Total", made: "Created for free with NovaFacture" }
   };
 
   // Noms des taxes sur un document en anglais
@@ -50,7 +50,7 @@
     seller: "", sellerIds: "", client: "", logo: "",
     lines: [{ d: "", q: 1, p: 0 }],
     notes: L("Paiement sous 30 jours par virement ou PayPal. Merci de votre confiance !", "Payment due within 30 days by bank transfer or PayPal. Thank you for your business!"),
-    legal: "", deposit: "", payLink: ""
+    legal: "", discount: "", deposit: "", payLink: ""
   });
 
   let state = load() || defaults();
@@ -76,10 +76,14 @@
   }
 
   function compute() {
-    const sub = round2(state.lines.reduce((s, l) => s + (Number(l.q) || 0) * (Number(l.p) || 0), 0));
+    const gross = round2(state.lines.reduce((s, l) => s + (Number(l.q) || 0) * (Number(l.p) || 0), 0));
+    // Remise globale en % appliquée avant taxes (0 à 100).
+    const pct = Math.min(100, Math.max(0, Number(String(state.discount || "").replace(",", ".")) || 0));
+    const disc = round2(gross * pct / 100);
+    const sub = round2(gross - disc);
     const tx = taxes().map(([n, r]) => [n, r, round2(sub * r / 100)]);
     const total = round2(sub + tx.reduce((s, t) => s + t[2], 0));
-    return { sub, tx, total };
+    return { gross, pct, disc, sub, tx, total };
   }
 
   // ---------- Formulaire ----------
@@ -127,7 +131,7 @@
   function render() {
     const t = T[state.lang] || T.fr;
     const isQ = state.type === "quote", isR = state.type === "receipt";
-    const { sub, tx, total } = compute();
+    const { gross, pct, disc, sub, tx, total } = compute();
     const dep = Math.max(0, Number(String(state.deposit || "").replace(",", ".")) || 0);
     const link = /^https?:\/\//i.test(String(state.payLink || "").trim()) ? String(state.payLink).trim() : "";
     const rows = state.lines.filter((l) => l.d || Number(l.p)).map((l) => {
@@ -150,7 +154,7 @@
       </div>
       <table><thead><tr><th>${t.desc}</th><th class="num">${t.qty}</th><th class="num">${t.price}</th><th class="num">${t.amount}</th></tr></thead><tbody>${rows}</tbody></table>
       <div class="totals">
-        <div><span>${t.sub}</span><span>${money(sub)}</span></div>
+        ${disc > 0 ? `<div><span>${t.sub}</span><span>${money(gross)}</span></div><div><span>${t.discount} (${state.lang === "en" ? pct + "%" : String(pct).replace(".", ",") + " %"})</span><span>− ${money(disc)}</span></div><div><span>${t.net}</span><span>${money(sub)}</span></div>` : `<div><span>${t.sub}</span><span>${money(sub)}</span></div>`}
         ${tx.map(([n, r, a]) => `<div><span>${esc(taxName(n))} (${state.lang === "en" ? r + "%" : String(r).replace(".", ",") + " %"})</span><span>${money(a)}</span></div>`).join("")}
         <div class="grand"><span>${t.total}</span><span>${money(total)}</span></div>
         ${dep > 0 && !isR && !isQ ? `<div><span>${t.deposit}</span><span>− ${money(dep)}</span></div><div class="grand"><span>${t.balance}</span><span>${money(round2(total - dep))}</span></div>` : ""}
@@ -173,7 +177,7 @@
 
   function init() {
     fillSelects();
-    ["type", "lang", "number", "date", "due", "seller", "sellerIds", "client", "notes", "legal", "customName", "customRate", "deposit", "payLink"].forEach((k) => bindField(k, k));
+    ["type", "lang", "number", "date", "due", "seller", "sellerIds", "client", "notes", "legal", "customName", "customRate", "discount", "deposit", "payLink"].forEach((k) => bindField(k, k));
     bindField("currency", "currency");
     const preset = $("#preset");
     preset.value = state.preset;
@@ -205,7 +209,7 @@
     renderLines(); render();
   }
 
-  const FIELDS = ["type", "lang", "number", "date", "due", "seller", "sellerIds", "client", "notes", "legal", "customName", "customRate", "currency", "deposit", "payLink"];
+  const FIELDS = ["type", "lang", "number", "date", "due", "seller", "sellerIds", "client", "notes", "legal", "customName", "customRate", "currency", "discount", "deposit", "payLink"];
   // Charge un document complet dans le formulaire (utilisé par « Mes documents »). Le logo actuel est conservé si absent.
   function applyState(s) {
     const logo = state.logo;
