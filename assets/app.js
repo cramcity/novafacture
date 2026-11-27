@@ -24,6 +24,8 @@
     "sn": { labelEn: "Senegal — VAT 18%", label: "Sénégal — TVA 18 %", cur: "XOF", taxes: [["TVA", 18]], ids: ["NINEA", "RCCM"] },
     "cm": { labelEn: "Cameroon — VAT 19.25%", label: "Cameroun — TVA 19,25 %", cur: "XAF", taxes: [["TVA", 19.25]], ids: ["NIU", "RCCM"] },
     "cd": { labelEn: "DR Congo — VAT 16%", label: "RD Congo — TVA 16 %", cur: "CDF", taxes: [["TVA", 16]], ids: ["NIF", "RCCM"] },
+    "ma20": { labelEn: "Morocco — VAT 20%", label: "Maroc — TVA 20 %", cur: "MAD", taxes: [["TVA", 20]], ids: ["ICE", "IF"] },
+    "maae": { labelEn: "Morocco — auto-entrepreneur (no VAT)", label: "Maroc — auto-entrepreneur (sans TVA)", cur: "MAD", taxes: [], ids: ["ICE", "IF"], legal: "Auto-entrepreneur : TVA non facturée.", legalEn: "Auto-entrepreneur: no VAT charged." },
     "uk": { labelEn: "United Kingdom — VAT 20%", label: "Royaume-Uni — TVA (VAT) 20 %", cur: "GBP", taxes: [["TVA", 20]], ids: ["VAT No."] },
     "au": { labelEn: "Australia — GST 10%", label: "Australie — GST 10 %", cur: "AUD", taxes: [["TPS", 10]], ids: ["ABN"], legal: "Facture fiscale (Tax invoice).", legalEn: "Tax invoice." },
     "us": { labelEn: "United States — no sales tax", label: "États-Unis — sans taxe de vente", cur: "USD", taxes: [], ids: ["EIN (optional)"] },
