@@ -135,6 +135,29 @@
     a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
     a.download = `novafacture-sauvegarde-${today()}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
+  // Export CSV (Excel / comptable) : FR = séparateur « ; » et virgule décimale, EN = « , » et point.
+  function exportCsv() {
+    const docs = read(DOCS);
+    if (!docs.length) { NF().toast(L("Aucun document à exporter", "No documents to export")); return; }
+    const SEP = EN ? "," : ";";
+    const num = (v) => { const s = (Math.round((Number(v) || 0) * 100) / 100).toFixed(2); return EN ? s : s.replace(".", ","); };
+    const cell = (v) => { let s = String(v ?? "").replace(/\r?\n/g, " ").trim(); if (/^[=+@\t]|^-(?![\d.,]+$)/.test(s)) s = "'" + s; return /[";,]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+    const head = EN
+      ? ["Type", "Number", "Date", "Due date", "Client", "Status", "Subtotal", "Taxes", "Total", "Deposit received", "Balance due", "Currency"]
+      : ["Type", "Numéro", "Date", "Échéance", "Client", "Statut", "Sous-total", "Taxes", "Total", "Acompte reçu", "Reste à payer", "Devise"];
+    const rows = docs.slice().sort((a, b) => String(a.state.date || "").localeCompare(String(b.state.date || ""))).map((d) => {
+      const s = d.state;
+      const sub = Math.round((s.lines || []).reduce((t, l) => t + (Number(l.q) || 0) * (Number(l.p) || 0), 0) * 100) / 100;
+      const dep = s.type === "invoice" ? Math.max(0, Number(String(s.deposit || "").replace(",", ".")) || 0) : 0;
+      return [TYPE[s.type] || s.type, s.number, s.date, s.type === "receipt" ? "" : s.due, (s.client || "").split("\n")[0], statusLabel(statusOf(d)),
+        num(sub), num(d.total - sub), num(d.total), dep ? num(dep) : "", s.type === "invoice" ? num(d.status === "paid" ? 0 : d.total - dep) : "", d.currency].map(cell).join(SEP);
+    });
+    const csv = "﻿" + [head.join(SEP), ...rows].join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    a.download = `novafacture-${L("historique", "history")}-${today()}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    NF().toast(L(`${docs.length} document(s) exporté(s) en CSV`, `${docs.length} document(s) exported to CSV`));
+  }
   function importAll(file) {
     const r = new FileReader();
     r.onload = () => {
@@ -174,6 +197,7 @@
       <p style="color:var(--muted);margin-top:0">${L("Historique, suivi des paiements, relances et reçus. Tout reste sur cet appareil : exportez une sauvegarde régulièrement.", "History, payment tracking, reminders and receipts. Everything stays on this device: export a backup regularly.")}</p>
       <div class="actions" style="margin:10px 0">
         <button type="button" class="btn ghost small" id="nf-next">${L("Dupliquer pour le mois suivant", "Duplicate for next month")}</button>
+        <button type="button" class="btn ghost small" id="nf-csv">${L("Exporter en CSV (Excel)", "Export to CSV (Excel)")}</button>
         <button type="button" class="btn ghost small" id="nf-export">${L("Exporter une sauvegarde", "Export a backup")}</button>
         <label class="btn ghost small" style="margin:0">${L("Importer une sauvegarde", "Import a backup")}<input type="file" id="nf-import" accept="application/json,.json" hidden></label>
       </div>
@@ -181,6 +205,7 @@
     </div>`;
     $("main#outil").insertAdjacentElement("afterend", sec);
     $("#nf-next").addEventListener("click", nextMonth);
+    $("#nf-csv").addEventListener("click", exportCsv);
     $("#nf-export").addEventListener("click", exportAll);
     $("#nf-import").addEventListener("change", (e) => { if (e.target.files[0]) importAll(e.target.files[0]); e.target.value = ""; });
     $("#nf-docs").addEventListener("click", onListClick);
