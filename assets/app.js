@@ -124,12 +124,25 @@
     });
   }
 
+  // France, franchise en base : la mention change au 1er janvier 2027 (art. 293 B du CGI -> art. L. 233-3 du CIBS).
+  // On ne remplace que la phrase exacte, selon la date du document ; le reste du texte saisi est conservé.
+  const VAT_OLD = "TVA non applicable, art. 293 B du CGI.", VAT_NEW = "TVA non applicable, art. L. 233-3 du CIBS.";
+  function syncVatMention() {
+    const txt = state.legal || "";
+    const want = String(state.date || "") >= "2027-01-01" ? VAT_NEW : VAT_OLD, other = want === VAT_NEW ? VAT_OLD : VAT_NEW;
+    if (!txt.includes(other)) return false;
+    state.legal = txt.split(other).join(want);
+    const el = $("#legal"); if (el) el.value = state.legal;
+    return true;
+  }
+
   function applyPreset() {
     const p = PRESETS[state.preset];
     state.currency = p.cur;
     $("#currency").value = state.currency;
     state.legal = (UI_EN && p.legalEn) || p.legal || "";
     $("#legal").value = state.legal;
+    syncVatMention();
     $("#sellerIds").placeholder = p.ids.length ? p.ids.join(" : …\n") + " : …" : L("Numéros d'entreprise (facultatif)", "Business numbers (optional)");
     $("#customBox").hidden = !p.custom;
   }
@@ -194,6 +207,8 @@
     fillSelects();
     ["type", "lang", "number", "date", "due", "seller", "sellerIds", "client", "notes", "legal", "customName", "customRate", "discount", "deposit", "payLink", "color"].forEach((k) => bindField(k, k));
     bindField("currency", "currency");
+    $("#date").addEventListener("input", () => { if (syncVatMention()) { render(); toast(L("Mention de TVA adaptée à la date (art. L. 233-3 du CIBS dès le 1er janvier 2027)", "VAT exemption wording updated for the date")); } });
+    syncVatMention();
     const preset = $("#preset");
     preset.value = state.preset;
     $("#customBox").hidden = !PRESETS[state.preset]?.custom;
@@ -205,6 +220,7 @@
       state.number = nextNumber(state.number); state.date = today(); state.due = addDays(today(), 30);
       state.client = ""; state.lines = [{ d: "", q: 1, p: 0 }];
       ["number", "date", "due", "client"].forEach((k) => ($("#" + k).value = state[k]));
+      syncVatMention();
       renderLines(); render(); toast(L("Nouveau document — vos coordonnées sont conservées", "New document — your details are kept"));
     });
     $("#reset").addEventListener("click", () => { if (confirm(L("Effacer toutes les données saisies sur cet appareil ?", "Erase all data entered on this device?"))) { state = defaults(); save(); location.reload(); } });
