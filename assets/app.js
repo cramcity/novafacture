@@ -46,10 +46,14 @@
   const today = () => new Date().toISOString().slice(0, 10);
   const addDays = (d, n) => { const x = new Date(d + "T12:00:00"); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 
+  // Couleur d'accent du document (titre, en-tête du tableau, total). Valeur hexadécimale validée.
+  const DEF_COLOR = "#2f4cdd";
+  const safeColor = (c) => (/^#[0-9a-f]{6}$/i.test(c || "") ? c : DEF_COLOR);
+
   const defaults = () => ({
     type: "invoice", lang: UI_EN ? "en" : "fr", preset: UI_EN ? "on" : "qc", currency: "CAD", customName: L("Taxe", "Tax"), customRate: 10,
     number: "2026-001", date: today(), due: addDays(today(), 30),
-    seller: "", sellerIds: "", client: "", logo: "",
+    seller: "", sellerIds: "", client: "", logo: "", color: DEF_COLOR,
     lines: [{ d: "", q: 1, p: 0 }],
     notes: L("Paiement sous 30 jours par virement ou PayPal. Merci de votre confiance !", "Payment due within 30 days by bank transfer or PayPal. Thank you for your business!"),
     legal: "", discount: "", deposit: "", payLink: ""
@@ -57,6 +61,7 @@
 
   let state = load() || defaults();
   if (!state.date) state.date = today();
+  state.color = safeColor(state.color);
 
   function load() { try { return JSON.parse(localStorage.getItem(STORE)); } catch { return null; } }
   function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch { /* stockage indisponible */ } }
@@ -141,6 +146,7 @@
       return `<tr><td>${esc(l.d)}</td><td class="num">${esc(l.q)}</td><td class="num">${money(Number(l.p) || 0)}</td><td class="num">${money(amt)}</td></tr>`;
     }).join("") || `<tr><td colspan="4" style="color:#999">—</td></tr>`;
 
+    $("#doc").style.setProperty("--doc", safeColor(state.color));
     $("#doc").innerHTML = `
       <div class="dhead">
         <div>${state.logo ? `<img class="dlogo" src="${esc(state.logo)}" alt="Logo">` : ""}<h1>${isR ? t.receipt : isQ ? t.quote : t.invoice}</h1></div>
@@ -186,7 +192,7 @@
 
   function init() {
     fillSelects();
-    ["type", "lang", "number", "date", "due", "seller", "sellerIds", "client", "notes", "legal", "customName", "customRate", "discount", "deposit", "payLink"].forEach((k) => bindField(k, k));
+    ["type", "lang", "number", "date", "due", "seller", "sellerIds", "client", "notes", "legal", "customName", "customRate", "discount", "deposit", "payLink", "color"].forEach((k) => bindField(k, k));
     bindField("currency", "currency");
     const preset = $("#preset");
     preset.value = state.preset;
@@ -208,6 +214,7 @@
       const r = new FileReader(); r.onload = () => { state.logo = r.result; render(); }; r.readAsDataURL(f);
     });
     $("#noLogo").addEventListener("click", () => { state.logo = ""; $("#logo").value = ""; render(); });
+    $("#defColor").addEventListener("click", () => { state.color = DEF_COLOR; $("#color").value = DEF_COLOR; render(); });
 
     // Bouton d'achat du kit
     document.querySelectorAll("[data-kit-buy]").forEach((a) => {
@@ -218,12 +225,13 @@
     renderLines(); render();
   }
 
-  const FIELDS = ["type", "lang", "number", "date", "due", "seller", "sellerIds", "client", "notes", "legal", "customName", "customRate", "currency", "discount", "deposit", "payLink"];
+  const FIELDS = ["type", "lang", "number", "date", "due", "seller", "sellerIds", "client", "notes", "legal", "customName", "customRate", "currency", "discount", "deposit", "payLink", "color"];
   // Charge un document complet dans le formulaire (utilisé par « Mes documents »). Le logo actuel est conservé si absent.
   function applyState(s) {
-    const logo = state.logo;
+    const logo = state.logo, color = state.color;
     state = Object.assign(defaults(), JSON.parse(JSON.stringify(s)));
     if (!state.logo) state.logo = logo;
+    state.color = safeColor(s && s.color ? s.color : color);
     if (!Array.isArray(state.lines) || !state.lines.length) state.lines = [{ d: "", q: 1, p: 0 }];
     FIELDS.forEach((k) => { const el = $("#" + k); if (el) el.value = state[k] ?? ""; });
     $("#preset").value = state.preset;
